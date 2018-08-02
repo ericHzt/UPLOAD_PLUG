@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="ACT_PRINT_PLUG3.1:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ACT_PRINT_PLUG3_1_jar</output-path>
+    <root id="root">
+      <element id="archive" name="ACT_PRINT_PLUG1.0.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="ACT_PRINT_PLUG1.0" />
+      </element>
+      <element id="library" level="project" name="lib" />
+    </root>
+  </artifact>
+</component>
