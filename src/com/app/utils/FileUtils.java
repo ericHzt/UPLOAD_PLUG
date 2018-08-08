@@ -29,7 +29,9 @@ import net.sf.json.JSONObject;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -197,7 +199,7 @@ public class FileUtils {
 	/**
 	 * 
 	 * @param dirName
-	 * @param license文件
+	 * @param
 	 * @return
 	 */
 	public static boolean deleteDirectoryFile(String dirName,String prefix) {
@@ -370,8 +372,6 @@ public class FileUtils {
 	/**
 	 * 只获取注册文件
 	 * 获目录下的文件列表的名称
-	 * @param dir 搜索目录
-	 * @param searchDirs 是否是搜索目录
 	 * @return 文件列表
 	 */
 	public static List<String> getLicenceList(String path) {
@@ -524,13 +524,18 @@ public class FileUtils {
 	/**httppost 文件上传
 	 * @param url
 	 * @param file
+	 * @return JSON对象
+	 *
 	 */
-	public static String uploadFile(String url,Map<String,String> map,File file){
+	public static JSONObject uploadFile(String url,Map<String,String> map,File file){
+		JSONObject failJson = new JSONObject();
 		if(StringUtils.isBlank(url)){
-			return Constants.Dict.NULL_PARAMETER.getValue();
+			failJson.put("code", Constants.Dict.NULL_PARAMETER.getValue());
+			return failJson;
 		}
 		if(!file.exists()){
-			return Constants.Dict.ILLEGAL_PARAMETER.getValue();
+			failJson.put("code", Constants.Dict.ILLEGAL_PARAMETER.getValue());
+			return failJson;
 		}
 		/*//设置代理
 		HttpHost proxy = new HttpHost("127.0.0.1",8888,"http");
@@ -572,14 +577,23 @@ public class FileUtils {
 				}
 				reader.close();
 				System.out.println(sb.toString());
-				preaseJSON(sb.toString());
-				return preaseJSON(sb.toString());
+				if(StringUtils.isNotBlank(sb.toString())){
+					return JSONObject.fromObject(sb.toString());
+				}
+				failJson.put("code",Constants.Dict.UPLOAD_UNKNOW_FAIL.getValue());
+				return failJson;
 			}else{
-				return Constants.Dict.UPLOAD_FIAL.getValue();
+				failJson.put("code",Constants.Dict.UPLOAD_FIAL.getValue());
+				return failJson;
 			}
+		}catch (HttpHostConnectException e){
+			e.printStackTrace();
+			failJson.put("code",Constants.Dict.REQUEST_NOTFIND.getValue());
+			return failJson;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return Constants.Dict.UPLOAD_FIAL.getValue();
+			failJson.put("code",Constants.Dict.UPLOAD_FIAL.getValue());
+			return failJson;
 		}finally{
 			try {
 				httpClient.close();
@@ -588,6 +602,8 @@ public class FileUtils {
 			}
 		}
 	}
+
+
 	
 	/**多文件批量上传
 	 * @param url
@@ -665,6 +681,24 @@ public class FileUtils {
 		}
 		JSONObject json = JSONObject.fromObject(jsonStr);
 		return json.getString("code");
+	}
+
+	/*
+
+	*function: 根据Key获取json对象
+
+	*parameter
+
+	*throw
+
+	*created by Eric
+
+	*/
+	public static Object preaseJSON(JSONObject json, String key) {
+		if(json==null){
+			return null;
+		}
+		return json.get(key);
 	}
 
 }

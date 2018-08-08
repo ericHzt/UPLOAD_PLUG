@@ -1,42 +1,48 @@
 package com.app.bean;
 
+import com.app.utils.PropertiesLoader;
+
 import java.awt.Rectangle;
 import java.util.Map;
 
- /**配置Bean
+ /**配置Bean 单例模式
  * @author ERIC
  *
  */
 public class SettingBean {
-	private String invoice_num;
-	private String filePath; 		//普票底版文件路径
-	private String zFilePath;		//专票底版文件路径
-	private String waterFilePath; 	//数据源文件根目录
-	private String savePath;		//文件保存路径
-	private String listSavePath;	//发票列表保存路径
-	private String testWaterFile;	//发票测试文件
-	private String testInvoiceList;	//清单测试文件
-	private String rootDic;			//保存文件根目录
-	
-	private Integer x;    		//发票数据X偏移
-	private Integer y;			//发票数据Y偏移
-	private Integer numX;		//发票号码X便宜
-	private Integer numY;		//发票号码Y偏移
-	private Integer codeX;		//发票代码X便宜
-	private Integer codeY;		//发票代码Y便宜
-	private Boolean isStamp;	//是否需要印章
-	private Integer stampX;		//印章X偏移
-	private Integer stampY;		//印章Y偏移
-	private Integer lStampX;	//清单印章X偏移量配置
-	private Integer lStampY;	//清单印章Y偏移量配置
-	private Integer alpha;		//透明度
-	private Boolean debug;		//debug模式
-	private Boolean isUpload;	//是否接入上传系统
-	private String uploadFilePath;//上传文件根目录
-	private String uploadUrl;	//文件上传路径
-	private String uploadInvoicePath;		//发票文件上传路径
-	private String uploadFilesPath;			//文件上传路径
-	private String uploadInvoiceListPath;	//发票清单上传路径
+     //配置文件读取
+    public PropertiesLoader initLoader;
+    private String invoice_num;
+    private String filePath; 		//普票底版文件路径
+    private String zFilePath;		//专票底版文件路径
+    private String waterFilePath; 	//数据源文件根目录
+    private String savePath;		//文件保存路径
+    private String listSavePath;	//发票列表保存路径
+    private String testWaterFile;	//发票测试文件
+    private String testInvoiceList;	//清单测试文件
+    private String rootDic;			//保存文件根目录
+
+    private Integer x;    		//发票数据X偏移
+    private Integer y;			//发票数据Y偏移
+    private Integer numX;		//发票号码X便宜
+    private Integer numY;		//发票号码Y偏移
+    private Integer codeX;		//发票代码X便宜
+    private Integer codeY;		//发票代码Y便宜
+    private Boolean isStamp;	//是否需要印章
+    private Integer stampX;		//印章X偏移
+    private Integer stampY;		//印章Y偏移
+    private Integer lStampX;	//清单印章X偏移量配置
+    private Integer lStampY;	//清单印章Y偏移量配置
+    private Integer alpha;		//透明度
+    private Boolean debug;		//debug模式
+    private Boolean isUpload;	//是否接入上传系统
+    private String uploadFilePath;//上传文件根目录
+    private String uploadUrl;	//文件上传路径
+    private String uploadInvoicePath;		//发票文件上传路径
+    private String uploadFilesPath;			//文件上传路径
+    private String uploadInvoiceListPath;	//发票清单上传路径
+	private String lastUploadOperation;	//最后一次文件xml上传成功时间
+    private String lastDisUplodOperation;	//最后一次作废文件上传成功时间
 	
 	
 	private Integer rectX;		//矩阵x起点
@@ -50,6 +56,24 @@ public class SettingBean {
 	private Rectangle rect;
 	
 	private Map<String, String> stampMap;
+
+     public static volatile SettingBean instance;
+
+     private SettingBean(){
+
+     };
+
+     public static SettingBean getInstance(PropertiesLoader initLoader){
+         if(instance == null){
+             synchronized (SettingBean.class) {
+                 if (instance == null) {
+                     instance = new SettingBean();
+                     instance.setInitLoader(initLoader);
+                 }
+             }
+         }
+         return instance;
+     }
 	
 	public Integer getAlpha() {
 		return alpha;
@@ -255,8 +279,44 @@ public class SettingBean {
 	public void setUploadInvoiceListPath(String uploadInvoiceListPath) {
 		this.uploadInvoiceListPath = uploadInvoiceListPath;
 	}
-	
-	
-	
 
-}
+     public String getLastUploadOperation() {
+         return lastUploadOperation;
+     }
+
+     public void setLastUploadOperation(String lastUploadOperation) {
+         this.lastUploadOperation = lastUploadOperation;
+     }
+
+     public String getLastDisUplodOperation() {
+         return lastDisUplodOperation;
+     }
+
+     public void setLastDisUplodOperation(String lastDisUplodOperation) {
+         this.lastDisUplodOperation = lastDisUplodOperation;
+     }
+
+     public PropertiesLoader getInitLoader() {
+         return initLoader;
+     }
+
+     public void setInitLoader(PropertiesLoader initLoader) {
+         this.initLoader = initLoader;
+     }
+
+     /*
+
+          *function:保存设置（只保存上传文件最后一次成功操作的时间）
+
+          *parameter
+
+          *throw
+
+          *created by Eric
+
+          */
+     public void saveSetting(){
+         initLoader.updateProperties("lastUploadOperation", lastUploadOperation);
+         initLoader.updateProperties("lastDisUplodOperation", lastDisUplodOperation);
+     }
+ }

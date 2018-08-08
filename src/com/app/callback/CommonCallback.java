@@ -16,4 +16,12 @@ public abstract class CommonCallback {
 		
 	};
 
+	public void updateDataSuccessLabel(String timeStr,String operaType,String fileName){
+
+	};
+
+	public void uplateDataFailLabel(String fileName,String operaType){
+
+	};
+
 }

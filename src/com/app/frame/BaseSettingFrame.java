@@ -87,12 +87,16 @@ public class BaseSettingFrame extends BaseFrame {
 	public Boolean isUpload;
 	
 	public String uploadUrl;
+
+	public String lastUploadOperation;		//最后一次成功上传xml操作时间 精确到millisecond
+
+	public String lastDisUplodOperation;	//最后一次成功作废xml操作时间
 	
 	
 	
 	public BaseSettingFrame(){
 		super();
-		settingBean = new SettingBean();
+		settingBean = SettingBean.getInstance(initLoader);
 		this.stampMap = new HashMap<String, String>();
 		String invoiceList[] = INVOICE_NUM.split(",");
 		for(String str : invoiceList){
@@ -117,14 +121,10 @@ public class BaseSettingFrame extends BaseFrame {
 		this.isStamp = initLoader.getBoolean("isStamp");
 		this.debug = initLoader.getBoolean("debug");
 		this.alpha = initLoader.getIntegerProperty("alpha");
-		/*if(isStamp){
-			
-		}*/
 		this.stampX = initLoader.getIntegerProperty("stampX");
 		this.stampY = initLoader.getIntegerProperty("stampY");
 		this.lStampX = initLoader.getIntegerProperty("lStampX");
 		this.lStampY = initLoader.getIntegerProperty("lStampY");
-		
 		this.rectX = initLoader.getIntegerProperty("rectX");
 		this.rectY = initLoader.getIntegerProperty("rectY");
 		this.rectWidth = initLoader.getIntegerProperty("rectWidth");
@@ -132,6 +132,8 @@ public class BaseSettingFrame extends BaseFrame {
 		this.isUpload = initLoader.getBoolean("isUpload");
 		this.uploadFilePath = initLoader.getProperty("uploadFilePath");
 		this.uploadUrl = initLoader.getProperty("uploadUrl");
+		this.lastDisUplodOperation = initLoader.getProperty("lastDisUplodOperation");
+		this.lastUploadOperation = initLoader.getProperty("lastUploadOperation");
 		rect = new Rectangle(this.rectX,this.rectY,this.rectWidth,this.rectHeight);
 		
 		settingBean.setX(this.x);
@@ -169,6 +171,8 @@ public class BaseSettingFrame extends BaseFrame {
 		settingBean.setUploadFilesPath(this.uploadFilePath+"file"+java.io.File.separator);
 		settingBean.setUploadInvoicePath(this.uploadFilePath+"invoiceImage"+java.io.File.separator);
 		settingBean.setUploadInvoiceListPath(this.uploadFilePath+"invoiceListImage"+java.io.File.separator);
+		settingBean.setLastUploadOperation(lastUploadOperation);
+		settingBean.setLastDisUplodOperation(lastDisUplodOperation);
 		
 		try {
 			/*recordSet = FileUtils.fileToSet(printRecordPath);

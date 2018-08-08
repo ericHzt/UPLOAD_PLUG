@@ -11,8 +11,8 @@ public class Constants {
 	 *
 	 */
 	public static enum Dict{
-		REQUEST_FIAL("400","请求错误"),
-		REQUEST_NOTFIND("404","服务器无响应"),
+		REQUEST_FIAL("400","上传失败，请求错误"),
+		REQUEST_NOTFIND("404","上传失败，服务器无响应"),
 		REQUEST_SUCCESS("200","请求成功"),
 		UPLOAD_SUCCESS("0","文件上传成功"),
 		UPLOAD_FIAL("-1","文件上传失败"),
@@ -25,7 +25,10 @@ public class Constants {
 		
 		INVOICE_IMAGE("1000","发票数据"),
 		INVOICELIST_IMAGE("1001","发票清单"),
-		FILE("1002","普通文件");
+		FILE("1002","普通文件"),
+		OPERATION_TYPE_IMAGE("2001","上传图片"),
+		OPERATION_TYPE_XML("2002","上传数据"),
+		OPERATION_TYPE_DISXML("2003","作废数据");
 		
 		
 		private Dict(String value,String name){

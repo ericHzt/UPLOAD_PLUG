@@ -38,14 +38,13 @@ import com.app.filewatcher.FileActionCallback;
 import com.app.filewatcher.WatchDir;
 import com.app.ocr.Tesseract1;
 import com.app.panel.BackgroundPanel;
+import com.app.panel.JContentPaneUpLoad;
 import com.app.thread.UploadThread;
 import com.app.thread.WatchThread;
 import com.app.utils.FileUtils;
 import com.app.utils.ImageCheck;
-import com.app.utils.NewImageUtils;
 import com.app.utils.PropertiesLoader;
 import com.eltima.components.ui.DatePicker;
-import com.sun.org.glassfish.external.arc.Taxonomy;
 
 /**
  * @author ERIC
@@ -56,8 +55,9 @@ public class MainFrame extends BaseSettingFrame {
 	private JPanel mainPanle = null;					//主容器
 	private JTabbedPane jTabbedpane = null;// 存放选项卡的组件
     private JPanel jContentPane = null;					//主页面
-    private JPanel jContentPaneUpLoad = null;			//上传xml文件页面
-    private JPanel jContentPaneDis = null;				//上传作废数据页面
+    private JContentPaneUpLoad jContentPaneUpLoad = null;			//上传xml文件页面
+	private JContentPaneUpLoad jContentPaneDis = null;		//上传作废数据页面
+    /*private JPanel jContentPaneDis = null;				//上传作废数据页面*/
     private URL url = null;								// 声明图片的URL
     private Image image=null;							// 声明图像对象
     private BackgroundPanel jPanel = null;				// 声明自定义背景面板对象
@@ -112,7 +112,10 @@ public class MainFrame extends BaseSettingFrame {
     private String uuidchange = UUID.randomUUID().toString().replaceAll("-", "");//打印变动
     
     private CommonCallback commonCallback;				//通用回调方法
-    
+
+	private JLabel lastUploadLabel;						//上传label
+	private JLabel lastDisUploadLabel;					//dis上传label
+
     /**
      * @param
      */
@@ -285,9 +288,9 @@ public class MainFrame extends BaseSettingFrame {
         if(isUpload){
         	startUploadThread();
         }
-        this.setSize(575, 565);
+        this.setSize(575, 575);
         this.setJMenuBar(getJJMenuBar());
-        this.setTitle("ACT发票图片生成软件 V3.1");
+        this.setTitle("ACT发票图片生成软件U V3.1-beta");
         /*this.setContentPane(getJContentPane());*/
         this.setContentPane(getMainPanle());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -298,12 +301,16 @@ public class MainFrame extends BaseSettingFrame {
         		if(resourseQueue.size()>0){
         			int n=JOptionPane.showConfirmDialog(null, "当前有打印任务正在进行，关闭程序打印任务将强制终止，是否确认关闭？","警告",JOptionPane.OK_CANCEL_OPTION);
         			if(n == 0){
+						settingBean.saveSetting();
         				System.exit(0);
+
         			}
         		}else{
         			int n=JOptionPane.showConfirmDialog(null, "是否确认关闭？","警告",JOptionPane.OK_CANCEL_OPTION);
         			if(n == 0){
+						settingBean.saveSetting();
         				System.exit(0);
+
         			}
         		}
         	}
@@ -312,9 +319,6 @@ public class MainFrame extends BaseSettingFrame {
     private JPanel getMainPanle(){
     	if(mainPanle==null){
     		mainPanle = new JPanel(new GridLayout(1, 1));
-    		/*mainPanle.add("JContentPane",getJContentPane());//主页面
-			mainPanle.add("JContentPaneUpLoad",getjContentPaneUpLoad()); // 上传页面
-			mainPanle.add("JContentPaneDis",getjContentPaneDis());//作废页面*/
 			mainPanle.add(getJTabbedpane());
 		}
 		return mainPanle;
@@ -326,25 +330,58 @@ public class MainFrame extends BaseSettingFrame {
     		ImageIcon homeIcon = new ImageIcon(imagePath+java.io.File.separator+"home.png");
     		jTabbedpane.addTab("主页",homeIcon,getJContentPane(),"主页");
     		ImageIcon uploadIcon = new ImageIcon(imagePath+"/upload.png");
-			jTabbedpane.addTab("上传页",uploadIcon,getjContentPaneUpLoad(),"上传数据");
+			jTabbedpane.addTab("上传数据页",uploadIcon,getJContentPaneUpLoad(),"上传数据");
 			ImageIcon disIcon = new ImageIcon(imagePath+"/disable.png");
-			jTabbedpane.addTab("作废页",disIcon,getjContentPaneDis(),"发票作废");
+			jTabbedpane.addTab("作废数据页",disIcon,getJContentPaneDis(),"发票作废");
 		}
 		return jTabbedpane;
 	}
 
-	private JPanel getjContentPaneUpLoad(){
-    	if(jContentPaneUpLoad == null){
-    		jContentPaneUpLoad = new JPanel();
-    		jContentPaneUpLoad.setBackground(Color.RED);
+	private JContentPaneUpLoad getJContentPaneUpLoad(){
+   		if(jContentPaneUpLoad == null ){
+			try {
+				image=javax.imageio.ImageIO.read(new File(imagePath+"/main_frame.bmp"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			jContentPaneUpLoad = new JContentPaneUpLoad(image,"上传数据操作描述信息");
 		}
 		return jContentPaneUpLoad;
 	}
 
-	private JPanel getjContentPaneDis(){
+	public JLabel getLastUploadLabel() {
+   		if(lastUploadLabel == null){
+   			lastUploadLabel = new JLabel(settingBean.getLastUploadOperation());
+			lastUploadLabel.setBounds(new Rectangle(5, 15, 70, 18));
+		}
+		return lastUploadLabel;
+	}
+
+	public JLabel getLastDisUploadLabel() {
+   		if(lastDisUploadLabel == null){
+   			lastDisUploadLabel = new JLabel(settingBean.getLastDisUplodOperation());
+			lastDisUploadLabel.setBounds(new Rectangle(5, 40, 70, 18));
+		}
+		return lastDisUploadLabel;
+	}
+
+	/*private JPanel getjContentPaneUpLoad(){
+    	if(jContentPaneUpLoad == null){
+    		jContentPaneUpLoad = new JPanel();
+    		jContentPaneUpLoad.setBackground(Color.RED);
+			jContentPaneUpLoad.add(getLastUploadLabel());
+		}
+		return jContentPaneUpLoad;
+	}*/
+
+	private JContentPaneUpLoad getJContentPaneDis(){
 		if(jContentPaneDis == null ){
-			jContentPaneDis = new JPanel();
-			jContentPaneDis.setBackground(Color.BLUE);
+			try {
+				image=javax.imageio.ImageIO.read(new File(imagePath+"/main_frame.bmp"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			jContentPaneDis = new JContentPaneUpLoad(image,"作废数据操作描述信息");
 		}
 		return jContentPaneDis;
 	}
@@ -415,7 +452,7 @@ public class MainFrame extends BaseSettingFrame {
     	jTextArea.setLineWrap(true);//激活自动换行功能 
         jTextArea.setWrapStyleWord(true);//激活断行不断字功能 
         jTextArea.setEditable(false);
-        jTextArea.append("==** 欢迎使用ACT发票图片生成软件**==\n\n");
+        jTextArea.append("==** 欢迎使用ACT发票图片采集系统**==\n\n");
         //为JTextArea添加滚动条
         JScrollPane jsp = new JScrollPane(jTextArea);
         jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -696,7 +733,9 @@ public class MainFrame extends BaseSettingFrame {
             jMenuItem5.setIcon(new ImageIcon(imagePath+"/exit.png"));
             jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
+					settingBean.saveSetting();
                     System.exit(0);
+
                 }
             });
         }
@@ -1105,6 +1144,29 @@ public class MainFrame extends BaseSettingFrame {
 				}
 				appendText(str, false);
 			}
+			@Override
+			public void updateDataSuccessLabel(String str,String operaType,String fileName){
+				if(Constants.Dict.OPERATION_TYPE_XML.getValue().equals(operaType)){
+					jContentPaneUpLoad.updateLabel(str);
+					jContentPaneUpLoad.appendText(fileName+"文件上传成功！");
+				}else if(Constants.Dict.OPERATION_TYPE_DISXML.getValue().equals(operaType)){
+					jContentPaneDis.updateLabel(str);
+					jContentPaneDis.appendText(fileName+"文件上传成功！");
+				}else{
+					;
+				}
+			}
+			@Override
+			public void uplateDataFailLabel(String fileName,String operaType){
+				if(Constants.Dict.OPERATION_TYPE_XML.getValue().equals(operaType)){
+					jContentPaneUpLoad.appendText(fileName+"文件上传失败！");
+				}else if(Constants.Dict.OPERATION_TYPE_DISXML.getValue().equals(operaType)){
+					jContentPaneDis.appendText(fileName+"文件上传失败！");
+				}else{
+					;
+				}
+			}
+
 		};
 		if(settingBean.getIsUpload()){
 			//文件上传参数

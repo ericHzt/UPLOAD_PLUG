@@ -1,24 +1,21 @@
 package com.app.panel;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-
 import javax.swing.*;
+import java.awt.*;
 
-/**
- * @author ERIC
- *
- * 自定义背景面板
- */
-public class BackgroundPanel extends JPanel {
-	private static final long serialVersionUID = 1L;
+public class JContentPaneData extends JPanel {
+    private static final long serialVersionUID = 1L;
     private Image image; // 定义图像对象
-    public BackgroundPanel(Image image) {
+    private JPanel searchPanel;
+    private JTextArea textArea;
+    private JLabel lastUploadLabel;
+    private JLabel messageLabel;
+    public JContentPaneData(Image image,String message) {
         super(); // 调用超类的构造方法
         this.image = image; // 为图像对象赋值
-        initialize();
+        initialize(message);
     }
+
     /*
      * 重写paintComponent方法
      */
@@ -32,7 +29,8 @@ public class BackgroundPanel extends JPanel {
             g2.drawImage(image, 0, 0, width, height, this);
         }
     }
-    private void initialize() {
-        this.setSize(300, 200);
+    private void initialize(String message) {
+        this.setSize(575, 575);
+        this.setLayout(null);
     }
 }

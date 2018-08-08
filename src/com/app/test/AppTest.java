@@ -202,8 +202,8 @@ public class AppTest {
 		String url = "http://localhost:8080/a/api/printApi/upload";
 		Map<String,String> map = new HashMap<String,String>();
 		map.put("invoice", BaseFrame.INVOICE_NUM);
-		String value = FileUtils.uploadFile(url, map,file);
+		/*String value = FileUtils.uploadFile(url, map,file);
 		String name = Constants.Dict.ILLEGAL_PARAMETER.getMessageByKey(value);
-		System.out.println(name);
+		System.out.println(name);*/
 	}
 }
